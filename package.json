@@ -1,0 +1,19 @@
+{
+  "name": "com.edgargaza.unitycharts",
+  "displayName": "Unity Charts",
+  "version": "0.1.0-preview",
+  "unity": "2021.1",
+  "keywords": [
+    "unity",
+    "ui",
+    "charts",
+    "ugui",
+    "uitoolkit"
+  ],
+  "author": {
+    "name": "edgargaza",
+    "url": "https://github.com/edgargaza"
+  },
+  "license": "GNU General Public License v3.0",
+  "description": "This package allows to create UI charts, based on uGUI."
+}
