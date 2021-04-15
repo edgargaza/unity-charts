@@ -13,19 +13,20 @@ namespace UnityCharts
         [SerializeField, Range(0, 360)] private float angleDegrees = 360f;
         [SerializeField, Range(0, 1)] private float distanceFromCenterPercentage;
 
-        [SerializeField, Min(0)] private float outlineThickness;
-        [SerializeField] private Color32 outlineColor = Color.black;
-
-        [SerializeField] private float inlineThickness;
+        [SerializeField, Range(0, 1)] private float inlineThickness;
         [SerializeField] private Color32 inlineColor = Color.black;
+
+        [SerializeField, Range(0, 1)] private float outlineThickness;
+        [SerializeField] private Color32 outlineColor = Color.black;
+        [SerializeField] private bool outlineMimicsInline;
 
         [SerializeField] private bool isAnimated = true;
 
         [SerializeField] private List<DataNode> data = new List<DataNode>();
 
-        private bool playAnimation;
-        private float playAnimationTimestamp;
-        private float fillAmount = 1f;
+        private bool _playAnimation;
+        private float _playAnimationTimestamp;
+        private float _fillAmount = 1f;
 
         protected override void Awake()
         {
@@ -35,13 +36,13 @@ namespace UnityCharts
 
         private void Update()
         {
-            if (!playAnimation) return;
+            if (!_playAnimation) return;
 
-            fillAmount += Mathf.Lerp(0f, 1f, Time.deltaTime);
-            if (Time.time - playAnimationTimestamp > 1f)
+            _fillAmount += Mathf.Lerp(0f, 1f, Time.deltaTime);
+            if (Time.time - _playAnimationTimestamp > 1f)
             {
-                playAnimation = false;
-                fillAmount = 1f;
+                _playAnimation = false;
+                _fillAmount = 1f;
             }
 
             SetVerticesDirty();
@@ -51,17 +52,19 @@ namespace UnityCharts
         {
             if (Application.isPlaying)
             {
-                playAnimation = true;
-                playAnimationTimestamp = Time.time;
-                fillAmount = 0f;
+                _playAnimation = true;
+                _playAnimationTimestamp = Time.time;
+                _fillAmount = 0f;
             }
         }
 
         protected override void OnPopulateMesh(VertexHelper vh)
         {
+            if (data.Count == 0) return;
+
             var width = rectTransform.rect.width;
 
-            var distanceFromCenter = -(distanceFromCenterPercentage * (width / 2 - 5f));
+            var distanceFromCenter = -(distanceFromCenterPercentage * (width / 2 - 5));
 
             var outer = -rectTransform.pivot.x * rectTransform.rect.width;
             var inner = -rectTransform.pivot.x * rectTransform.rect.width;
@@ -71,7 +74,7 @@ namespace UnityCharts
             var prevX = Vector2.zero;
             var prevY = Vector2.zero;
 
-            var f = fillAmount;
+            var f = _fillAmount;
             var degrees = -angleDegrees / Segments;
             var fa = (int) ((Segments + 1) * f);
 
@@ -125,10 +128,10 @@ namespace UnityCharts
                 // Draw inline.
                 vh.AddUIVertexQuad(GenerateVertexes(new[]
                     {
-                        pos0 * (distanceFromCenterPercentage - distanceFromCenterPercentage / 10), 
-                        pos1 * (distanceFromCenterPercentage - distanceFromCenterPercentage / 10), 
-                        pos2 * (distanceFromCenterPercentage - distanceFromCenterPercentage / 10) * inlineThickness, 
-                        pos3 * (distanceFromCenterPercentage - distanceFromCenterPercentage / 10) * inlineThickness
+                        pos0 * distanceFromCenterPercentage * ((width - 10) / width),
+                        pos1 * distanceFromCenterPercentage * ((width - 10) / width),
+                        pos2 * distanceFromCenterPercentage * ((width - 10) / width) * (1 - inlineThickness),
+                        pos3 * distanceFromCenterPercentage * ((width - 10) / width) * (1 - inlineThickness)
                     }, new[]
                     {
                         uv0, uv1, uv2, uv3
@@ -136,24 +139,34 @@ namespace UnityCharts
                 );
 
                 // Draw outline.
-                vh.AddUIVertexQuad(GenerateVertexes(new[]
-                    {
-                        pos0, pos1, pos2 * (1 + outlineThickness / 50), pos3 * (1 + outlineThickness / 50)
-                    }, new[]
-                    {
-                        uv0, uv1, uv2, uv3
-                    }, outlineColor)
-                );
-
-                /*
-                // Draw outer circle.
-                vh.AddUIVertexQuad(SetVbo(new[] {pos0, pos1, pos2, pos3}, new[] {uv0, uv1, uv2, uv3}, borderColor));
-
-                // Draw inner circle.
-                vh.AddUIVertexQuad(SetVbo(
-                    new[] {pos0 * outer1 / outer, pos1 * outer1 / outer, pos2 * inner1 / inner, pos3 * inner1 / inner},
-                    new[] {uv0, uv1, uv2, uv3}, borderColor));
-                */
+                if (outlineMimicsInline)
+                {
+                    vh.AddUIVertexQuad(GenerateVertexes(new[]
+                        {
+                            pos0,
+                            pos1,
+                            pos2 * (1 + inlineThickness * distanceFromCenterPercentage * outlineThickness),
+                            pos3 * (1 + inlineThickness * distanceFromCenterPercentage * outlineThickness)
+                        }, new[]
+                        {
+                            uv0, uv1, uv2, uv3
+                        }, outlineColor)
+                    );
+                }
+                else
+                {
+                    vh.AddUIVertexQuad(GenerateVertexes(new[]
+                        {
+                            pos0,
+                            pos1,
+                            pos2 * (1 + outlineThickness),
+                            pos3 * (1 + outlineThickness)
+                        }, new[]
+                        {
+                            uv0, uv1, uv2, uv3
+                        }, outlineColor)
+                    );
+                }
 
                 prevX = pos1;
                 prevY = pos2;

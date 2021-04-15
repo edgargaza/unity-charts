@@ -5,55 +5,58 @@ namespace UnityCharts.Editor
     [CustomEditor(typeof(PieChart))]
     public class PieChartEditor : UnityEditor.Editor
     {
-        private new PieChart target;
+        private PieChart _target;
 
-        private SerializedProperty angleDegreesProperty,
-            distanceFromCenterPercentageProperty,
-            inlineThicknessProperty,
-            inlineColorProperty,
-            outlineThicknessProperty,
-            outlineColorProperty,
-            isAnimatedProperty,
-            dataProperty;
+        private SerializedProperty _angleDegreesProperty,
+            _distanceFromCenterPercentageProperty,
+            _inlineThicknessProperty,
+            _inlineColorProperty,
+            _outlineThicknessProperty,
+            _outlineColorProperty,
+            _outlineMimicsInlineProperty,
+            _isAnimatedProperty,
+            _dataProperty;
 
         private void OnEnable()
         {
-            angleDegreesProperty = serializedObject.FindProperty("angleDegrees");
-            distanceFromCenterPercentageProperty = serializedObject.FindProperty("distanceFromCenterPercentage");
+            _angleDegreesProperty = serializedObject.FindProperty("angleDegrees");
+            _distanceFromCenterPercentageProperty = serializedObject.FindProperty("distanceFromCenterPercentage");
             
-            inlineThicknessProperty = serializedObject.FindProperty("inlineThickness");
-            inlineColorProperty = serializedObject.FindProperty("inlineColor");
+            _inlineThicknessProperty = serializedObject.FindProperty("inlineThickness");
+            _inlineColorProperty = serializedObject.FindProperty("inlineColor");
             
-            outlineThicknessProperty = serializedObject.FindProperty("outlineThickness");
-            outlineColorProperty = serializedObject.FindProperty("outlineColor");
+            _outlineThicknessProperty = serializedObject.FindProperty("outlineThickness");
+            _outlineColorProperty = serializedObject.FindProperty("outlineColor");
+            _outlineMimicsInlineProperty = serializedObject.FindProperty("outlineMimicsInline");
             
-            isAnimatedProperty = serializedObject.FindProperty("isAnimated");
+            _isAnimatedProperty = serializedObject.FindProperty("isAnimated");
             
-            dataProperty = serializedObject.FindProperty("data");
+            _dataProperty = serializedObject.FindProperty("data");
         }
 
         public override void OnInspectorGUI()
         {
-            target = (PieChart) base.target;
+            _target = (PieChart) target;
 
             serializedObject.Update();
 
-            EditorGUILayout.PropertyField(angleDegreesProperty);
-            EditorGUILayout.PropertyField(distanceFromCenterPercentageProperty);
+            EditorGUILayout.PropertyField(_angleDegreesProperty);
+            EditorGUILayout.PropertyField(_distanceFromCenterPercentageProperty);
             
             EditorGUILayout.Space();
-            EditorGUILayout.PropertyField(inlineThicknessProperty);
-            EditorGUILayout.PropertyField(inlineColorProperty);
+            EditorGUILayout.PropertyField(_inlineThicknessProperty);
+            EditorGUILayout.PropertyField(_inlineColorProperty);
             
             EditorGUILayout.Space();
-            EditorGUILayout.PropertyField(outlineThicknessProperty);
-            EditorGUILayout.PropertyField(outlineColorProperty);
+            EditorGUILayout.PropertyField(_outlineThicknessProperty);
+            EditorGUILayout.PropertyField(_outlineColorProperty);
+            EditorGUILayout.PropertyField(_outlineMimicsInlineProperty);
             
             EditorGUILayout.Space();
-            EditorGUILayout.PropertyField(isAnimatedProperty);
+            EditorGUILayout.PropertyField(_isAnimatedProperty);
             
             EditorGUILayout.Space();
-            EditorGUILayout.PropertyField(dataProperty);
+            EditorGUILayout.PropertyField(_dataProperty);
 
             serializedObject.ApplyModifiedProperties();
         }
