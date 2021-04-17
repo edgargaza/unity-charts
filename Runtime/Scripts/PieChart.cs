@@ -6,23 +6,23 @@ using UnityEngine.UI;
 namespace UnityCharts
 {
     [RequireComponent(typeof(RectTransform), typeof(CanvasRenderer))]
-    public class PieChart : Chart
+    public class PieChart : RadialDraggableChart
     {
-        private const int Segments = 720;
+        private const int Segments = 360;
 
-        [SerializeField, Range(0, 360)] private float angleDegrees = 360f;
+        [Space, SerializeField, Range(0, 360)] private float angleDegrees = 360f;
         [SerializeField, Range(0, 1)] private float distanceFromCenterPercentage;
 
-        [SerializeField, Range(0, 1)] private float inlineThickness;
+        [Space, SerializeField, Range(0, 1)] private float inlineThickness;
         [SerializeField] private Color32 inlineColor = Color.black;
 
-        [SerializeField, Range(0, 1)] private float outlineThickness;
+        [Space, SerializeField, Range(0, 1)] private float outlineThickness;
         [SerializeField] private Color32 outlineColor = Color.black;
         [SerializeField] private bool outlineMimicsInline;
 
-        [SerializeField] private bool isAnimated = true;
+        [Space, SerializeField] private bool isAnimated = true;
 
-        [SerializeField] private List<DataNode> data = new List<DataNode>();
+        [Space, SerializeField] private List<DataNode> data = new List<DataNode>();
 
         private bool _playAnimation;
         private float _playAnimationTimestamp;
@@ -74,15 +74,15 @@ namespace UnityCharts
             var prevX = Vector2.zero;
             var prevY = Vector2.zero;
 
-            var f = _fillAmount;
-            var degrees = -angleDegrees / Segments;
-            var fa = (int) ((Segments + 1) * f);
-
             var dataIndex = 0;
             var total = 0f;
             var currentValue = data[0].value;
-
+            
             data.ForEach(s => total += s.value);
+            
+            var f = _fillAmount;
+            var degrees = -angleDegrees / Segments;
+            var fa = (int) ((Segments + 1) * f);
 
             var fillColor = data[0].tint;
 
@@ -112,12 +112,11 @@ namespace UnityCharts
                         fillColor = data[dataIndex % data.Count].tint;
                     }
                 }
-
+                
                 // Draw fill.
                 vh.AddUIVertexQuad(GenerateVertexes(new[]
                     {
-                        pos0, pos1, pos2 * distanceFromCenter / inner,
-                        pos3 * distanceFromCenter / inner
+                        pos0, pos1, pos2 * distanceFromCenter / inner, pos3 * distanceFromCenter / inner
                     },
                     new[]
                     {
@@ -143,8 +142,7 @@ namespace UnityCharts
                 {
                     vh.AddUIVertexQuad(GenerateVertexes(new[]
                         {
-                            pos0,
-                            pos1,
+                            pos0, pos1,
                             pos2 * (1 + inlineThickness * distanceFromCenterPercentage * outlineThickness),
                             pos3 * (1 + inlineThickness * distanceFromCenterPercentage * outlineThickness)
                         }, new[]
